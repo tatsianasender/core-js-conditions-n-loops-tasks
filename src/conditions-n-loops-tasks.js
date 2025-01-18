@@ -482,69 +482,36 @@ function sortByAsc(arr) {
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
 function shuffleChar(str, iterations) {
-  const n = str.length;
-  let newIterations = iterations;
-  if (n <= 1 || iterations === 0) return str;
+  const { length } = str;
 
-  const result = new Array(n);
-  for (let i = 0; i < n; i += 1) result[i] = str[i];
+  if (length === 0 || iterations === 0) {
+    return str;
+  }
 
-  let indices = new Array(n);
-  for (let i = 0; i < n; i += 1) indices[i] = i;
-
-  let cycleDetected = false;
-  let cycleLength = 0;
-  const seenStates = new Map();
-
-  for (let iteration = 0; iteration < newIterations; iteration += 1) {
-    const newIndices = new Array(n);
-    let writeOdd = Math.ceil(n / 2);
-    let writeEven = 0;
-
-    for (let i = 0; i < n; i += 1) {
-      if (indices[i] % 2 === 0) {
-        newIndices[(writeEven += 1)] = indices[i];
+  const finalPositions = new Array(length);
+  for (let i = 0; i < length; i += 1) {
+    let currentIndex = i;
+    for (let j = 0; j < iterations; j += 1) {
+      if (currentIndex % 2 === 0) {
+        currentIndex /= 2;
       } else {
-        newIndices[(writeOdd += 1)] = indices[i];
+        currentIndex = length / 2 + (currentIndex - 1) / 2;
       }
     }
-
-    indices = newIndices;
-
-    const stateKey = indices.join(',');
-    if (seenStates.has(stateKey)) {
-      cycleDetected = true;
-      cycleLength = iteration + 1 - seenStates.get(stateKey);
-      break;
-    }
-    seenStates.set(stateKey, iteration + 1);
+    finalPositions[i] = currentIndex;
   }
 
-  if (cycleDetected) {
-    newIterations %= cycleLength;
-    for (let i = 0; i < newIterations; i += 1) {
-      const newIndices = new Array(n);
-      let writeOdd = Math.ceil(n / 2);
-      let writeEven = 0;
-
-      for (let j = 0; j < n; j += 1) {
-        if (indices[j] % 2 === 0) {
-          newIndices[(writeEven += 1)] = indices[j];
-        } else {
-          newIndices[(writeOdd += 1)] = indices[j];
-        }
-      }
-
-      indices = newIndices;
-    }
+  const result = new Array(length);
+  for (let i = 0; i < length; i += 1) {
+    result[finalPositions[i]] = str[i];
   }
 
-  const finalResult = new Array(n);
-  for (let i = 0; i < n; i += 1) {
-    finalResult[indices[i]] = result[i];
+  let shuffledString = '';
+  for (let i = 0; i < length; i += 1) {
+    shuffledString += result[i];
   }
 
-  return finalResult.join('');
+  return shuffledString;
 }
 
 /**
